@@ -1,4 +1,31 @@
-// books.js — data layer: Book shape, store, and all operations
+// books.ts — data layer: Book shape, store, and all operations
+
+// ─── Module 1 Task ───────────────────────────────────────────────────────────
+//
+// Acceptance criteria:
+//   [x] Rename file from books.js to books.ts
+//   [x] Annotate addBook params (title, author, year)
+//   [x] Annotate filterBooks status param
+//   [x] Annotate sortBooks by param
+//   [x] Let TS infer return types — no annotation needed yet
+
+// ─── Module 2 Task ───────────────────────────────────────────────────────────
+//
+// Acceptance criteria:
+//   [x] Define interface Book with all 6 fields
+//   [x] Define type BookStatus = 'read' | 'unread'
+//   [x] Define type FilterStatus = 'all' | BookStatus
+//   [x] Apply Book[] to the books array
+//   [x] Type all remaining unannotated params using Book, BookStatus, FilterStatus
+//   [x] Add explicit return types to getBooks and addBook
+//   [x] Fix string widening in addBook with const book: Book = { ... }
+
+// ─── Module 3 Task ───────────────────────────────────────────────────────────
+//
+// Acceptance criteria:
+//   [x] Add explicit Book[] return type to sortBooks
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface Book {
   id: number
@@ -6,72 +33,34 @@ interface Book {
   author: string
   year: number
   status: BookStatus
-  rating: number | null
+  rating: number | null  // always present on the object; null means unrated
 }
 
-type BookStatus = 'read' | 'unread'
-type FilterStatus = 'all' | BookStatus
+type BookStatus   = 'read' | 'unread'       // valid states a book can be in
+type FilterStatus = 'all' | BookStatus      // extends BookStatus for the filter UI
 
-let nextId = 1 // NOTE: does not need to be rewritten as let nextId: number = 1.. If the type is obvious from the value on the right, let TS infer it. Annotate explicitly when the type isn't obvious, or when you're declaring without initializing.
-// NOTE: if the value was not defined, adding a type would make sense as its not obvious what the value may be.
+// ─── Store ───────────────────────────────────────────────────────────────────
 
-/**
- * Book shape:
- * {
- *   id:     number,
- *   title:  string,
- *   author: string,
- *   year:   number,
- *   status: 'read' | 'unread',
- *   rating: number | null   (1–5, optional)
- * }
- */
-
+let nextId = 1  // inferred as number — no annotation needed
 let books: Book[] = [
-  {
-    id: nextId++,
-    title: 'The Pragmatic Programmer',
-    author: 'Hunt & Thomas',
-    year: 1999,
-    status: 'read',
-    rating: 5,
-  },
-  {
-    id: nextId++,
-    title: 'Clean Code',
-    author: 'Robert C. Martin',
-    year: 2008,
-    status: 'read',
-    rating: 4,
-  },
-  {
-    id: nextId++,
-    title: "You Don't Know JS",
-    author: 'Kyle Simpson',
-    year: 2015,
-    status: 'unread',
-    rating: null,
-  },
-  {
-    id: nextId++,
-    title: 'Designing Data-Intensive Applications',
-    author: 'Martin Kleppmann',
-    year: 2017,
-    status: 'unread',
-    rating: null,
-  },
+  { id: nextId++, title: 'The Pragmatic Programmer',              author: 'Hunt & Thomas',     year: 1999, status: 'read',   rating: 5    },
+  { id: nextId++, title: 'Clean Code',                            author: 'Robert C. Martin',  year: 2008, status: 'read',   rating: 4    },
+  { id: nextId++, title: "You Don't Know JS",                     author: 'Kyle Simpson',      year: 2015, status: 'unread', rating: null },
+  { id: nextId++, title: 'Designing Data-Intensive Applications', author: 'Martin Kleppmann',  year: 2017, status: 'unread', rating: null },
 ]
+
+// ─── Operations ──────────────────────────────────────────────────────────────
 
 export function getBooks(): Book[] {
   return [...books]
 }
 
-export function addBook(title: string, author: string, year: number) {
-  const book: Book = {
+export function addBook(title: string, author: string, year: number): Book {
+  const book: Book = {  // explicit type prevents string widening on status
     id: nextId++,
     title,
     author,
-    year, // because the param is defined with type numbr above, can refactor this to just read as year: .. year: Number(year) is now considered redundant and misleading.
+    year,
     status: 'unread',
     rating: null,
   }
@@ -98,41 +87,49 @@ export function filterBooks(status: FilterStatus) {
   return books.filter((b) => b.status === status)
 }
 
-export function sortBooks(bookList: Book[], by: string) {
+export function sortBooks(bookList: Book[], by: string): Book[] {
   return [...bookList].sort((a, b) => {
-    if (by === 'title') return a.title.localeCompare(b.title)
+    if (by === 'title')  return a.title.localeCompare(b.title)
     if (by === 'author') return a.author.localeCompare(b.author)
-    if (by === 'year') return a.year - b.year
+    if (by === 'year')   return a.year - b.year
     return 0
   })
 }
 
-//  **   TypeScript is JavaScript with a type layer on top. At build time, the types are checked and then stripped — what runs in the browser is still plain JS. The types exist purely to catch mistakes early. **
-
-// Javascript: let name = "Stephen" - no type info
-// TypeScript: let name: string = "Stephen" - explicitally tpyed
-// TypeScript: let name = "Stephen" - also valid as TS infers string
-
-// Primitive Types:
-// string: "Hello"
-// number: 42, 10.5
-// boolean: true/false
-// null: null
-// undefined: undefined
-
-// Union Types:
-// ** for this app, the Union Types are "All" | "Read" | "Unread"
-// NOTE:  You can only filter by those three values — so those are the only valid inputs. If someone passes 'deleted', TypeScript catches it at compile time before it ever runs. You reasoned about it correctly: the union reflects the real-world constraints of the data.
-
-// TS is smart — it reads the right-hand side and infers the type. You don't always need to write the type explicitly. ** explicit — useful when the type isn't obvious from the value.
-// - annotate function parameters and return types always. Let TS infer everything else.
-
-// ** Avoid any as it turns off the typeScript protection. If dont know the type, use unknown for now.
-
-// ** you don't always need to annotate return types. TS infers them from what the function actually returns.
-
-// step 1: renamed file from books.js to books.ts
-// step 2: in main.js, update the impre to ^ books.ts
-// -- app still works at this point because Vite handles .ts natively
-// step 3: refactor the params for addBook, filterBooks, sortBooks to include Types
-// NOTE: no need to update the returns as TS infers them from what the fruntion actaully returns.
+// ─── TS Reference ────────────────────────────────────────────────────────────
+//
+// INFERENCE VS ANNOTATION
+//   let x = 1               → inferred as number, no annotation needed
+//   let x: number           → explicit, use when no initial value
+//   Rule: annotate params + return types; infer everything else
+//
+// PRIMITIVES
+//   string · number · boolean · null · undefined
+//
+// INTERFACE (object shapes)
+//   interface Book { id: number; title: string }
+//   Use for objects and classes
+//
+// TYPE ALIAS (unions, primitives, anything non-object)
+//   type BookStatus = 'read' | 'unread'
+//   type FilterStatus = 'all' | BookStatus   ← can extend another type
+//
+// INTERFACE vs TYPE
+//   interface  → can extend with `interface B extends A`, no unions
+//   type       → can't merge, but supports unions and intersections (&)
+//
+// OPTIONAL vs NULLABLE
+//   rating?: number         → may not exist at all (undefined)
+//   rating: number | null   → always present, but may be null
+//
+// STRING WIDENING GOTCHA
+//   const obj = { status: 'unread' }       → TS infers status as string
+//   const obj: Book = { status: 'unread' } → checks against Book, 'unread' ✅
+//
+// GENERICS
+//   A type variable — a placeholder filled in at usage time
+//   Array<Book>     → same as Book[], useful when nesting gets complex
+//   Promise<Book>   → a promise that resolves to a single Book
+//   Promise<Book[]> → a promise that resolves to an array of books
+//
+// AVOID `any` — disables TS checks entirely. Use `unknown` if type is truly unknown.

@@ -7,8 +7,8 @@ import {
   rateBook,
   filterBooks,
   sortBooks,
-} from './books.js';
-import { fetchBookDetails } from './api.js';
+} from './books.ts';
+import { fetchBookDetails } from './api.ts';
 
 let currentFilter = 'all';
 let currentSort   = 'title';
