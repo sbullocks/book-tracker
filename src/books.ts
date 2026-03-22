@@ -94,7 +94,7 @@ export function addBook(
   title: string,
   author: string,
   year: number,
-  rating?: number | null,
+  rating?: number,
 ): Book {
   const book: Book = {
     // explicit type prevents string widening on status
