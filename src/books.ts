@@ -54,7 +54,7 @@
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface Book {
+export interface Book {
   id: number
   title: string
   author: string
@@ -63,10 +63,10 @@ interface Book {
   rating: number | null // always present on the object; null means unrated
 }
 
-type BookStatus = 'read' | 'unread' // valid states a book can be in
-type FilterStatus = 'all' | BookStatus // extends BookStatus for the filter UI
-type SortKey = 'title' | 'author' | 'year'
-type BookSummary = Pick<Book, 'id' | 'title' | 'author'>
+export type BookStatus = 'read' | 'unread' // valid states a book can be in
+export type FilterStatus = 'all' | BookStatus // extends BookStatus for the filter UI
+export type SortKey = 'title' | 'author' | 'year'
+export type BookSummary = Pick<Book, 'id' | 'title' | 'author'>
 
 // ─── Store ───────────────────────────────────────────────────────────────────
 
