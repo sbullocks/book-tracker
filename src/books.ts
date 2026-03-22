@@ -32,6 +32,12 @@
 //   [x] Add optional rating? param to addBook
 //   [x] Use rating ?? null inside addBook to satisfy Book interface
 
+// ─── Module 5 Task ───────────────────────────────────────────────────────────
+//
+// Acceptance criteria:
+//   [x] Define a new type for the sort field as SortKey with 3 valid options of 'title' | 'author' | 'year'
+//   [x] Replace by: string in sortBooks with the newly defined type SortKey
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface Book {
@@ -45,6 +51,7 @@ interface Book {
 
 type BookStatus = 'read' | 'unread' // valid states a book can be in
 type FilterStatus = 'all' | BookStatus // extends BookStatus for the filter UI
+type SortKey = 'title' | 'author' | 'year'
 
 // ─── Store ───────────────────────────────────────────────────────────────────
 
@@ -123,12 +130,12 @@ export function rateBook(id: number, rating: number | null): void {
   if (book) book.rating = rating
 }
 
-export function filterBooks(status: FilterStatus) {
+export function filterBooks(status: FilterStatus): Book[] {
   if (status === 'all') return [...books]
   return books.filter((b) => b.status === status)
 }
 
-export function sortBooks(bookList: Book[], by: string): Book[] {
+export function sortBooks(bookList: Book[], by: SortKey): Book[] {
   return [...bookList].sort((a, b) => {
     if (by === 'title') return a.title.localeCompare(b.title)
     if (by === 'author') return a.author.localeCompare(b.author)
@@ -194,3 +201,19 @@ export function sortBooks(bookList: Book[], by: string): Book[] {
 //   const double: (n: number) => number = (n) => n * 2
 //   function run(fn: (n: number) => number, value: number) { ... }
 //   Syntax: (paramName: type) => returnType
+//
+// UNION TYPES
+//   type SortKey = 'title' | 'author' | 'year'   ← only valid values allowed
+//   type FilterStatus = 'all' | BookStatus        ← can extend another type
+//   Prefer named union types over loose string params
+//
+// DISCRIMINATED UNIONS
+//   A union of objects sharing a common field (the discriminant)
+//   type Result = { status: 'success'; data: Book } | { status: 'error'; message: string }
+//   TS narrows the type inside each if/else branch automatically
+//   Common pattern in React for async state (loading | success | error)
+//
+// INTERSECTION TYPES
+//   type BookWithTimestamp = Book & { createdAt: string }
+//   Must satisfy both types — all Book fields AND createdAt
+//   Less common than unions; useful for extending without inheritance
