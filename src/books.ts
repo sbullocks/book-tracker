@@ -35,6 +35,18 @@
 // ─── Module 5 Task ───────────────────────────────────────────────────────────
 //
 // Acceptance criteria:
+//   [x] Define type SortKey = 'title' | 'author' | 'year'
+//   [x] Replace by: string in sortBooks with by: SortKey
+//   [x] Add explicit Book[] return type to filterBooks
+
+// ─── Module 6 Task ───────────────────────────────────────────────────────────
+//
+// Acceptance criteria:
+//   [x] if (book) checks in updateStatus and rateBook are truthiness narrowing
+//       — .find() returns Book | undefined; the if guard proves book exists before use
+
+//
+// Acceptance criteria:
 //   [x] Define a new type for the sort field as SortKey with 3 valid options of 'title' | 'author' | 'year'
 //   [x] Replace by: string in sortBooks with the newly defined type SortKey
 
