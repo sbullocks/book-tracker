@@ -8,6 +8,13 @@
 //   [x] Annotate fetchBookDetails — param: string, return: Promise<BookDetails>
 //   [x] Add Book[] return type to sortBooks in books.ts
 
+// ─── Module 6 Task ───────────────────────────────────────────────────────────
+//
+// Acceptance criteria:
+//   [x] Annotate fakeDatabase as Record<string, BookDetails>
+//       — keys are slug strings, values are BookDetails objects
+//       — TS now knows match[1] is BookDetails without any runtime narrowing needed
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface BookDetails {
@@ -17,11 +24,23 @@ interface BookDetails {
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const fakeDatabase = {
-  'pragmatic-programmer': { pages: 352, description: 'A classic guide to pragmatic software craftsmanship.' },
-  'clean-code':           { pages: 431, description: 'Principles and best practices for writing readable code.' },
-  'you-dont-know-js':     { pages: 278, description: 'A deep dive into the core mechanisms of JavaScript.' },
-  'designing-data':       { pages: 616, description: 'A thorough guide to scalable, reliable data systems.' },
+const fakeDatabase: Record<string, BookDetails> = {
+  'pragmatic-programmer': {
+    pages: 352,
+    description: 'A classic guide to pragmatic software craftsmanship.',
+  },
+  'clean-code': {
+    pages: 431,
+    description: 'Principles and best practices for writing readable code.',
+  },
+  'you-dont-know-js': {
+    pages: 278,
+    description: 'A deep dive into the core mechanisms of JavaScript.',
+  },
+  'designing-data': {
+    pages: 616,
+    description: 'A thorough guide to scalable, reliable data systems.',
+  },
 }
 
 // ─── Functions ───────────────────────────────────────────────────────────────
@@ -68,4 +87,19 @@ export function fetchBookDetails(title: string): Promise<BookDetails> {
 //   books.map(...)    → depends on what the callback returns
 //
 //   .find() returns Book | undefined — TS is honest: find can fail.
-//   This matters in Module 6 (type narrowing).
+//
+// TYPE NARROWING
+//   Proving to TS which specific type a value is before using it
+//
+//   typeof  → primitives
+//     if (typeof value === 'string') { value.toUpperCase() }
+//
+//   in      → check if property exists on an object
+//     if ('data' in result) { result.data }
+//
+//   truthiness → handles null/undefined
+//     if (book) { book.rating = 5 }  ← you use this in books.ts already
+//
+//   Type at the source when possible — annotate the data structure itself
+//   so TS never has to guess. Record<string, BookDetails> eliminates the
+//   need for runtime narrowing on fakeDatabase lookups entirely.
