@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
+
+// target: "ESNext"
+// Tells TypeScript not to downcompile anything — output stays as modern JS. Safe because Vite/your bundler handles browser compatibility.
+// module: "ESNext"
+// Keep import/export syntax as-is in the output. Again, let the bundler deal with it.
+// moduleResolution: "bundler"
+// Tells TS to resolve imports the way a bundler (Vite) would, not the way Node.js would. This is why you can write import Foo from './Foo' without the .tsx extension and TS won't complain.
+// strict: true
+// Enables all strict type checks at once — noImplicitAny, strictNullChecks, etc. Basically "don't let me be sloppy."
+// skipLibCheck: true
+// Don't type-check .d.ts files inside node_modules. Speeds up compilation and avoids errors from third-party packages with imperfect types.
+// include: ["src"]
+// Only compile files inside your src/ folder. Anything outside it (config files, scripts, etc.) is ignored by TS.
