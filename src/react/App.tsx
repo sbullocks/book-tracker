@@ -12,16 +12,16 @@ import type { FilterStatus, SortKey, Book } from '../books'
 //   [x] Type the useRef hook
 
 export default function App() {
-  const [filter, setFilter] = useState<FilterStatus>('all')  // needs explicit — 'all' alone infers string
-  const [sort, setSort]     = useState<SortKey>('title')     // needs explicit — 'title' alone infers string
-  const [books, setBooks]   = useState<Book[]>(getBooks())   // explicit is fine; getBooks() return type covers it
+  const [filter, setFilter] = useState<FilterStatus>('all') // needs explicit — 'all' alone infers string
+  const [sort, setSort] = useState<SortKey>('title') // needs explicit — 'title' alone infers string
+  const [books, setBooks] = useState<Book[]>(getBooks()) // explicit is fine; getBooks() return type covers it
 
-  const titleRef = useRef<HTMLInputElement>(null)  // HTMLInputElement | null
+  const titleRef = useRef<HTMLInputElement>(null) // HTMLInputElement | null
 
   const visible = sortBooks(filterBooks(filter), sort)
 
   function handleFilterChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setFilter(e.target.value as FilterStatus)  // select values return string — cast to FilterStatus
+    setFilter(e.target.value as FilterStatus) // select values return string — cast to FilterStatus
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -30,7 +30,8 @@ export default function App() {
     if (!title) return
     addBook(title, 'Unknown', 2024)
     setBooks(getBooks())
-    titleRef.current.value = ''
+    // titleRef.current.value = ''
+    if (titleRef.current) titleRef.current.value = ''
   }
 
   return (
@@ -49,7 +50,7 @@ export default function App() {
       </select>
 
       <div>
-        {visible.map(book => (
+        {visible.map((book) => (
           <BookCard key={book.id} book={book} />
         ))}
       </div>
