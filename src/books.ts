@@ -45,10 +45,12 @@
 //   [x] if (book) checks in updateStatus and rateBook are truthiness narrowing
 //       — .find() returns Book | undefined; the if guard proves book exists before use
 
+// ─── Module 7 Task ───────────────────────────────────────────────────────────
 //
 // Acceptance criteria:
-//   [x] Define a new type for the sort field as SortKey with 3 valid options of 'title' | 'author' | 'year'
-//   [x] Replace by: string in sortBooks with the newly defined type SortKey
+//   [x] Define type BookSummary using Pick<Book, 'id' | 'title' | 'author'>
+//   [x] Add updateBook(id, update: Partial<Book>): void using Object.assign
+//   [x] Add summariseBooks(): BookSummary[] using .map()
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -64,6 +66,7 @@ interface Book {
 type BookStatus = 'read' | 'unread' // valid states a book can be in
 type FilterStatus = 'all' | BookStatus // extends BookStatus for the filter UI
 type SortKey = 'title' | 'author' | 'year'
+type BookSummary = Pick<Book, 'id' | 'title' | 'author'>
 
 // ─── Store ───────────────────────────────────────────────────────────────────
 
@@ -130,6 +133,15 @@ export function addBook(
 
 export function removeBook(id: number): void {
   books = books.filter((b) => b.id !== id)
+}
+
+export function updateBook(id: number, update: Partial<Book>): void {
+  const book = books.find((b) => b.id === id)
+  if (book) Object.assign(book, update)
+}
+
+export function summariseBooks(): BookSummary[] {
+  return books.map((b) => ({ id: b.id, title: b.title, author: b.author }))
 }
 
 export function updateStatus(id: number, status: BookStatus): void {
@@ -229,3 +241,12 @@ export function sortBooks(bookList: Book[], by: SortKey): Book[] {
 //   type BookWithTimestamp = Book & { createdAt: string }
 //   Must satisfy both types — all Book fields AND createdAt
 //   Less common than unions; useful for extending without inheritance
+//
+// UTILITY TYPES
+//   Partial<T>        → all fields become optional — use for update payloads
+//   Pick<T, Keys>     → keep only listed fields
+//   Omit<T, Keys>     → remove listed fields (mirror of Pick)
+//   Record<K, V>      → object with keys of type K, values of type V
+//
+//   Object.assign(target, source) — copies fields from source onto target
+//   target = the object being mutated, source = the incoming data
