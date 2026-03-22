@@ -1,5 +1,25 @@
 // books.js — data layer: Book shape, store, and all operations
 
+interface Book {
+  id: number
+  title: string
+  author: string
+  year: number
+  status: BookStatus
+  rating: number | null
+}
+
+// type Status = {
+//   status: 'read' | 'unread' | 'all'
+// } // NOTE: Status IS the union, not an object containing it. No object needed.
+
+// type Status = 'read' | 'unread' | 'all'
+// NOTE: still incorrect as it should be split into 2 different types!
+
+// ✅ correct — split into two precise types
+type BookStatus = 'read' | 'unread' // what a book IS
+type FilterStatus = BookStatus | 'all' // what the filter ACCEPTS
+
 let nextId = 1 // NOTE: does not need to be rewritten as let nextId: number = 1.. If the type is obvious from the value on the right, let TS infer it. Annotate explicitly when the type isn't obvious, or when you're declaring without initializing.
 // NOTE: if the value was not defined, adding a type would make sense as its not obvious what the value may be.
 
@@ -15,7 +35,7 @@ let nextId = 1 // NOTE: does not need to be rewritten as let nextId: number = 1.
  * }
  */
 
-let books = [
+let books: Book[] = [
   {
     id: nextId++,
     title: 'The Pragmatic Programmer',
@@ -50,12 +70,12 @@ let books = [
   },
 ]
 
-export function getBooks() {
+export function getBooks(): Book[] {
   return [...books]
 }
 
-export function addBook(title: string, author: string, year: number) {
-  const book = {
+export function addBook(title: string, author: string, year: number): Book {
+  const book: Book = {
     id: nextId++,
     title,
     author,
@@ -67,26 +87,26 @@ export function addBook(title: string, author: string, year: number) {
   return book
 }
 
-export function removeBook(id) {
+export function removeBook(id: number) {
   books = books.filter((b) => b.id !== id)
 }
 
-export function updateStatus(id, status) {
+export function updateStatus(id: number, status: BookStatus) {
   const book = books.find((b) => b.id === id)
   if (book) book.status = status
 }
 
-export function rateBook(id, rating) {
+export function rateBook(id: number, rating: number | null) {
   const book = books.find((b) => b.id === id)
   if (book) book.rating = rating
 }
 
-export function filterBooks(status: string) {
+export function filterBooks(status: FilterStatus) {
   if (status === 'all') return [...books]
   return books.filter((b) => b.status === status)
 }
 
-export function sortBooks(bookList, by: string) {
+export function sortBooks(bookList: Book[], by: string) {
   return [...bookList].sort((a, b) => {
     if (by === 'title') return a.title.localeCompare(b.title)
     if (by === 'author') return a.author.localeCompare(b.author)
@@ -95,6 +115,7 @@ export function sortBooks(bookList, by: string) {
   })
 }
 
+// MODULE 1 Notes >
 //  **   TypeScript is JavaScript with a type layer on top. At build time, the types are checked and then stripped — what runs in the browser is still plain JS. The types exist purely to catch mistakes early. **
 
 // Javascript: let name = "Stephen" - no type info
@@ -119,8 +140,51 @@ export function sortBooks(bookList, by: string) {
 
 // ** you don't always need to annotate return types. TS infers them from what the function actually returns.
 
+// MODULE 1 Steps >
 // step 1: renamed file from books.js to books.ts
 // step 2: in main.js, update the impre to ^ books.ts
 // -- app still works at this point because Vite handles .ts natively
 // step 3: refactor the params for addBook, filterBooks, sortBooks to include Types
 // NOTE: no need to update the returns as TS infers them from what the fruntion actaully returns.
+
+// MODULE 2 Notes >
+// Interfaces & Type Aliases - TS is guessing at your Book shape. It infers the type of books from the array literal — which works, but gives you a weak, implicit type. Every function that touches a book is working with an anonymous object TS assembled on its own. We need to make the shape explicit and reusable.
+// There are 2 ways to define an object in TS - interface or type aliasis
+
+// interface Book {
+//   id: number,
+//   title: string
+// }
+
+// type Book = {
+//   id: number,
+//   title: string
+// }
+
+// Rule of thumb: use interface for object shapes, type for unions, primitives, and anything that isn't a plain object. You'll see both in React codebases — just be consistent.
+
+//                            interface                         type
+//   ├──────────────┼─────────────────────────────┼───────────────────────────────────────┤
+//   │ Extend/merge │ Yes — interface B extends A │ No merging, but can intersect with &  │
+//   ├──────────────┼─────────────────────────────┼───────────────────────────────────────┤
+//   │ Union types  │ No                          │ Yes — type Status = 'read' | 'unread' │
+//   ├──────────────┼─────────────────────────────┼───────────────────────────────────────┤
+//   │ Convention   │ Objects/classes             │ Everything else
+
+//  Optional properties
+
+//   interface Book {
+//     rating: number | null   - must be present, can be null
+//     rating?: number         - may not exist at all (undefined)
+//   }
+
+// in this project, rating is always present in the book object.. its just null when not set so updating to rating: number | null
+
+// MODULE 2 Steps >
+// 1. define a Book interface and a Status type above the let nextId line
+// 2. Apply Book to the books array
+// 3. Type the remaining unannotated function params using Book and Status:
+// - removeBook(id) — what type is id?
+// - updateStatus(id, status) — what types?
+// - rateBook(id, rating) — what types? (careful with rating)
+// - sortBooks(bookList, by) — bookList can now be typed properly
