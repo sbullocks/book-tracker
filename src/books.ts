@@ -1,5 +1,17 @@
 // books.js — data layer: Book shape, store, and all operations
 
+interface Book {
+  id: number
+  title: string
+  author: string
+  year: number
+  status: BookStatus
+  rating: number | null
+}
+
+type BookStatus = 'read' | 'unread'
+type FilterStatus = 'all' | BookStatus
+
 let nextId = 1 // NOTE: does not need to be rewritten as let nextId: number = 1.. If the type is obvious from the value on the right, let TS infer it. Annotate explicitly when the type isn't obvious, or when you're declaring without initializing.
 // NOTE: if the value was not defined, adding a type would make sense as its not obvious what the value may be.
 
@@ -15,7 +27,7 @@ let nextId = 1 // NOTE: does not need to be rewritten as let nextId: number = 1.
  * }
  */
 
-let books = [
+let books: Book[] = [
   {
     id: nextId++,
     title: 'The Pragmatic Programmer',
@@ -50,12 +62,12 @@ let books = [
   },
 ]
 
-export function getBooks() {
+export function getBooks(): Book[] {
   return [...books]
 }
 
 export function addBook(title: string, author: string, year: number) {
-  const book = {
+  const book: Book = {
     id: nextId++,
     title,
     author,
@@ -67,26 +79,26 @@ export function addBook(title: string, author: string, year: number) {
   return book
 }
 
-export function removeBook(id) {
+export function removeBook(id: number) {
   books = books.filter((b) => b.id !== id)
 }
 
-export function updateStatus(id, status) {
+export function updateStatus(id: number, status: BookStatus) {
   const book = books.find((b) => b.id === id)
   if (book) book.status = status
 }
 
-export function rateBook(id, rating) {
+export function rateBook(id: number, rating: number | null) {
   const book = books.find((b) => b.id === id)
   if (book) book.rating = rating
 }
 
-export function filterBooks(status: string) {
+export function filterBooks(status: FilterStatus) {
   if (status === 'all') return [...books]
   return books.filter((b) => b.status === status)
 }
 
-export function sortBooks(bookList, by: string) {
+export function sortBooks(bookList: Book[], by: string) {
   return [...bookList].sort((a, b) => {
     if (by === 'title') return a.title.localeCompare(b.title)
     if (by === 'author') return a.author.localeCompare(b.author)
