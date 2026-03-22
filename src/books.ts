@@ -8,20 +8,48 @@ interface Book {
   author: string
   year: number
   status: BookStatus
-  rating: number | null  // always present on the object; null means unrated
+  rating: number | null // always present on the object; null means unrated
 }
 
-type BookStatus   = 'read' | 'unread'       // valid states a book can be in
-type FilterStatus = 'all' | BookStatus      // extends BookStatus for the filter UI
+type BookStatus = 'read' | 'unread' // valid states a book can be in
+type FilterStatus = 'all' | BookStatus // extends BookStatus for the filter UI
 
 // ─── Store ───────────────────────────────────────────────────────────────────
 
-let nextId = 1  // inferred as number — no annotation needed
+let nextId = 1 // inferred as number — no annotation needed - let nextId: number = 1
 let books: Book[] = [
-  { id: nextId++, title: 'The Pragmatic Programmer',              author: 'Hunt & Thomas',     year: 1999, status: 'read',   rating: 5    },
-  { id: nextId++, title: 'Clean Code',                            author: 'Robert C. Martin',  year: 2008, status: 'read',   rating: 4    },
-  { id: nextId++, title: "You Don't Know JS",                     author: 'Kyle Simpson',      year: 2015, status: 'unread', rating: null },
-  { id: nextId++, title: 'Designing Data-Intensive Applications', author: 'Martin Kleppmann',  year: 2017, status: 'unread', rating: null },
+  {
+    id: nextId++,
+    title: 'The Pragmatic Programmer',
+    author: 'Hunt & Thomas',
+    year: 1999,
+    status: 'read',
+    rating: 5,
+  },
+  {
+    id: nextId++,
+    title: 'Clean Code',
+    author: 'Robert C. Martin',
+    year: 2008,
+    status: 'read',
+    rating: 4,
+  },
+  {
+    id: nextId++,
+    title: "You Don't Know JS",
+    author: 'Kyle Simpson',
+    year: 2015,
+    status: 'unread',
+    rating: null,
+  },
+  {
+    id: nextId++,
+    title: 'Designing Data-Intensive Applications',
+    author: 'Martin Kleppmann',
+    year: 2017,
+    status: 'unread',
+    rating: null,
+  },
 ]
 
 // ─── Operations ──────────────────────────────────────────────────────────────
@@ -31,7 +59,8 @@ export function getBooks(): Book[] {
 }
 
 export function addBook(title: string, author: string, year: number): Book {
-  const book: Book = {  // explicit type prevents string widening on status
+  const book: Book = {
+    // explicit type prevents string widening on status
     id: nextId++,
     title,
     author,
@@ -64,9 +93,9 @@ export function filterBooks(status: FilterStatus) {
 
 export function sortBooks(bookList: Book[], by: string) {
   return [...bookList].sort((a, b) => {
-    if (by === 'title')  return a.title.localeCompare(b.title)
+    if (by === 'title') return a.title.localeCompare(b.title)
     if (by === 'author') return a.author.localeCompare(b.author)
-    if (by === 'year')   return a.year - b.year
+    if (by === 'year') return a.year - b.year
     return 0
   })
 }
