@@ -25,6 +25,13 @@
 // Acceptance criteria:
 //   [x] Add explicit Book[] return type to sortBooks
 
+// ─── Module 4 Task ───────────────────────────────────────────────────────────
+//
+// Acceptance criteria:
+//   [x] Add void return types to removeBook, updateStatus, rateBook
+//   [x] Add optional rating? param to addBook
+//   [x] Use rating ?? null inside addBook to satisfy Book interface
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface Book {
@@ -33,20 +40,48 @@ interface Book {
   author: string
   year: number
   status: BookStatus
-  rating: number | null  // always present on the object; null means unrated
+  rating: number | null // always present on the object; null means unrated
 }
 
-type BookStatus   = 'read' | 'unread'       // valid states a book can be in
-type FilterStatus = 'all' | BookStatus      // extends BookStatus for the filter UI
+type BookStatus = 'read' | 'unread' // valid states a book can be in
+type FilterStatus = 'all' | BookStatus // extends BookStatus for the filter UI
 
 // ─── Store ───────────────────────────────────────────────────────────────────
 
-let nextId = 1  // inferred as number — no annotation needed
+let nextId = 1 // inferred as number — no annotation needed
 let books: Book[] = [
-  { id: nextId++, title: 'The Pragmatic Programmer',              author: 'Hunt & Thomas',     year: 1999, status: 'read',   rating: 5    },
-  { id: nextId++, title: 'Clean Code',                            author: 'Robert C. Martin',  year: 2008, status: 'read',   rating: 4    },
-  { id: nextId++, title: "You Don't Know JS",                     author: 'Kyle Simpson',      year: 2015, status: 'unread', rating: null },
-  { id: nextId++, title: 'Designing Data-Intensive Applications', author: 'Martin Kleppmann',  year: 2017, status: 'unread', rating: null },
+  {
+    id: nextId++,
+    title: 'The Pragmatic Programmer',
+    author: 'Hunt & Thomas',
+    year: 1999,
+    status: 'read',
+    rating: 5,
+  },
+  {
+    id: nextId++,
+    title: 'Clean Code',
+    author: 'Robert C. Martin',
+    year: 2008,
+    status: 'read',
+    rating: 4,
+  },
+  {
+    id: nextId++,
+    title: "You Don't Know JS",
+    author: 'Kyle Simpson',
+    year: 2015,
+    status: 'unread',
+    rating: null,
+  },
+  {
+    id: nextId++,
+    title: 'Designing Data-Intensive Applications',
+    author: 'Martin Kleppmann',
+    year: 2017,
+    status: 'unread',
+    rating: null,
+  },
 ]
 
 // ─── Operations ──────────────────────────────────────────────────────────────
@@ -55,29 +90,35 @@ export function getBooks(): Book[] {
   return [...books]
 }
 
-export function addBook(title: string, author: string, year: number): Book {
-  const book: Book = {  // explicit type prevents string widening on status
+export function addBook(
+  title: string,
+  author: string,
+  year: number,
+  rating?: number,
+): Book {
+  const book: Book = {
+    // explicit type prevents string widening on status
     id: nextId++,
     title,
     author,
     year,
     status: 'unread',
-    rating: null,
+    rating: rating ?? null,
   }
   books.push(book)
   return book
 }
 
-export function removeBook(id: number) {
+export function removeBook(id: number): void {
   books = books.filter((b) => b.id !== id)
 }
 
-export function updateStatus(id: number, status: BookStatus) {
+export function updateStatus(id: number, status: BookStatus): void {
   const book = books.find((b) => b.id === id)
   if (book) book.status = status
 }
 
-export function rateBook(id: number, rating: number | null) {
+export function rateBook(id: number, rating: number | null): void {
   const book = books.find((b) => b.id === id)
   if (book) book.rating = rating
 }
@@ -89,9 +130,9 @@ export function filterBooks(status: FilterStatus) {
 
 export function sortBooks(bookList: Book[], by: string): Book[] {
   return [...bookList].sort((a, b) => {
-    if (by === 'title')  return a.title.localeCompare(b.title)
+    if (by === 'title') return a.title.localeCompare(b.title)
     if (by === 'author') return a.author.localeCompare(b.author)
-    if (by === 'year')   return a.year - b.year
+    if (by === 'year') return a.year - b.year
     return 0
   })
 }
@@ -133,3 +174,23 @@ export function sortBooks(bookList: Book[], by: string): Book[] {
 //   Promise<Book[]> → a promise that resolves to an array of books
 //
 // AVOID `any` — disables TS checks entirely. Use `unknown` if type is truly unknown.
+//
+// VOID
+//   Use when a function exists for side effects and returns nothing
+//   function removeBook(id: number): void { ... }
+//   TS infers void anyway — explicit annotation is good documentation
+//
+// OPTIONAL PARAMS
+//   rating?: number        → caller can skip it; TS treats it as number | undefined
+//   Must come after required params: (a: string, b?: string) ✅
+//   Use ?? to handle undefined:  rating: rating ?? null
+//
+// DEFAULT PARAMS
+//   function greet(name: string, greeting = 'Hello') { ... }
+//   Default value implies the type — no annotation needed
+//   Implicitly optional — callers can skip it
+//
+// FUNCTION TYPES AS VALUES
+//   const double: (n: number) => number = (n) => n * 2
+//   function run(fn: (n: number) => number, value: number) { ... }
+//   Syntax: (paramName: type) => returnType
